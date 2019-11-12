@@ -1,0 +1,10 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <RootNamespace>Sdcb.TypeScript</RootNamespace>
+    <Authors>Sdcb</Authors>
+    <Description>TypeScript AST Parser, .NET Core standard 2.0 library, forked from: https://github.com/ToCSharp/TypeScriptAST</Description>
+  </PropertyGroup>
+
+</Project>
