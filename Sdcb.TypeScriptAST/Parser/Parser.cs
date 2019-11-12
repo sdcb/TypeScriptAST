@@ -465,7 +465,7 @@ namespace Sdcb.TypeScript.TsParser
         }
 
 
-        public void ParseErrorAtPosition(int start, int length, DiagnosticMessage message, object _ = null)
+        public void ParseErrorAtPosition(int start, int length, DiagnosticMessage message, object arg0 = null)
         {
             var lastError = LastOrUndefined(ParseDiagnostics);
             if (lastError == null || start != lastError.Start)
@@ -776,7 +776,7 @@ namespace Sdcb.TypeScript.TsParser
             return node;
         }
 
-        public Node CreateMissingNode<T>(SyntaxKind _, bool reportAtCurrentPosition, DiagnosticMessage diagnosticMessage = null, object arg0 = null) where T : Node
+        public Node CreateMissingNode<T>(SyntaxKind kind, bool reportAtCurrentPosition, DiagnosticMessage diagnosticMessage = null, object arg0 = null) where T : Node
         {
             if (reportAtCurrentPosition)
             {
@@ -1389,7 +1389,7 @@ namespace Sdcb.TypeScript.TsParser
         }
 
 
-        public Node CurrentNode(ParsingContext _)
+        public Node CurrentNode(ParsingContext parsingContext)
         {
             if (ParseErrorBeforeNextFinishedNode)
             {
@@ -1435,7 +1435,7 @@ namespace Sdcb.TypeScript.TsParser
             //return node;
         }
 
-        public INode CurrentNode2(ParsingContext _)
+        public INode CurrentNode2(ParsingContext parsingContext)
         {
             if (ParseErrorBeforeNextFinishedNode)
             {
@@ -1836,7 +1836,7 @@ namespace Sdcb.TypeScript.TsParser
             IEntityName entity = ParseIdentifier(diagnosticMessage);
             while (ParseOptional(SyntaxKind.DotToken))
             {
-                var node = new QualifiedName { Pos = entity.Pos };
+                QualifiedName node = new QualifiedName { Pos = entity.Pos };
                 //(QualifiedName)createNode(SyntaxKind.QualifiedName, entity.pos);
                 // !!!
                 node.Left = entity;
@@ -1940,7 +1940,7 @@ namespace Sdcb.TypeScript.TsParser
 
         public TemplateHead ParseTemplateHead()
         {
-            _ = Token();
+            var t = Token();
             var fragment = new TemplateHead();
             ParseLiteralLikeNode(fragment, /*internName*/ false);
 
@@ -3204,7 +3204,7 @@ namespace Sdcb.TypeScript.TsParser
             }
             var expr = ParseAssignmentExpressionOrHigher();
             /*BinaryOperator*/
-            Token operatorToken;
+            Token operatorToken = null;
             while ((operatorToken = (/*BinaryOperator*/Token)ParseOptionalToken</*BinaryOperator*/Token>(SyntaxKind.CommaToken)) != null)
             {
 
@@ -3350,7 +3350,7 @@ namespace Sdcb.TypeScript.TsParser
         {
 
             Debug.Assert(Token() == SyntaxKind.EqualsGreaterThanToken, "parseSimpleArrowFunctionExpression should only have been called if we had a =>");
-            ArrowFunction node;
+            ArrowFunction node = null;
             if (asyncModifier != null)
             {
 
@@ -4394,14 +4394,14 @@ namespace Sdcb.TypeScript.TsParser
         {
 
             ScanJsxIdentifier();
-            _ = Token() == SyntaxKind.ThisKeyword ?
+            IJsxTagNameExpression expression = Token() == SyntaxKind.ThisKeyword ?
                             ParseTokenNode<PrimaryExpression>(Token()) : ParseIdentifierName();
             if (Token() == SyntaxKind.ThisKeyword)
             {
                 IJsxTagNameExpression expression2 = ParseTokenNode<PrimaryExpression>(Token());
                 while (ParseOptional(SyntaxKind.DotToken))
                 {
-                    var propertyAccess = new PropertyAccessExpression { Pos = expression2.Pos }; //(PropertyAccessExpression)createNode(SyntaxKind.PropertyAccessExpression, expression.pos);
+                    PropertyAccessExpression propertyAccess = new PropertyAccessExpression { Pos = expression2.Pos }; //(PropertyAccessExpression)createNode(SyntaxKind.PropertyAccessExpression, expression.pos);
 
                     propertyAccess.Expression = expression2;
 
@@ -4417,7 +4417,7 @@ namespace Sdcb.TypeScript.TsParser
                 IJsxTagNameExpression expression2 = ParseIdentifierName();
                 while (ParseOptional(SyntaxKind.DotToken))
                 {
-                    var propertyAccess = new PropertyAccessExpression { Pos = expression2.Pos }; //(PropertyAccessExpression)createNode(SyntaxKind.PropertyAccessExpression, expression.pos);
+                    PropertyAccessExpression propertyAccess = new PropertyAccessExpression { Pos = expression2.Pos }; //(PropertyAccessExpression)createNode(SyntaxKind.PropertyAccessExpression, expression.pos);
 
                     propertyAccess.Expression = expression2;
 
@@ -5819,6 +5819,7 @@ namespace Sdcb.TypeScript.TsParser
 
                             return ParseExportDeclaration(fullStart, decorators, modifiers);
                     }
+                    break;
                 default:
 
                     if (decorators?.Any() == true || modifiers?.Any() == true)
@@ -7074,9 +7075,9 @@ namespace Sdcb.TypeScript.TsParser
         public ExportSpecifier ParseExportSpecifier()
         {
             var node = new ExportSpecifier { Pos = Scanner.GetStartPos() };
-            _ = IsKeyword(Token()) && !IsIdentifier();
-            _ = Scanner.GetTokenPos();
-            _ = Scanner.GetTextPos();
+            var checkIdentifierIsKeyword = IsKeyword(Token()) && !IsIdentifier();
+            var checkIdentifierStart = Scanner.GetTokenPos();
+            var checkIdentifierEnd = Scanner.GetTextPos();
             var identifierName = ParseIdentifierName();
             if (Token() == SyntaxKind.AsKeyword)
             {
@@ -7085,11 +7086,11 @@ namespace Sdcb.TypeScript.TsParser
 
                 ParseExpected(SyntaxKind.AsKeyword);
 
-                _ = IsKeyword(Token()) && !IsIdentifier();
+                checkIdentifierIsKeyword = IsKeyword(Token()) && !IsIdentifier();
 
-                _ = Scanner.GetTokenPos();
+                checkIdentifierStart = Scanner.GetTokenPos();
 
-                _ = Scanner.GetTextPos();
+                checkIdentifierEnd = Scanner.GetTextPos();
 
                 node.Name = ParseIdentifierName();
             }
@@ -7241,7 +7242,7 @@ namespace Sdcb.TypeScript.TsParser
         }
 
 
-        public void ProcessReferenceComments(SourceFile _)
+        public void ProcessReferenceComments(SourceFile sourceFile)
         {
             //var triviaScanner = new Scanner(sourceFile.languageVersion, /*skipTrivia*/false, LanguageVariant.Standard, sourceText);
             //List<FileReference> referencedFiles = new List<FileReference>();

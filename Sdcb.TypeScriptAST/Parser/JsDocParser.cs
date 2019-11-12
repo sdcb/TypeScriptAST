@@ -67,10 +67,12 @@ namespace Sdcb.TypeScript.TsParser
         {
             var dp = new JsDocParser(new Parser());
             dp.Parser.InitializeState(content, ScriptTarget.Latest,  null, ScriptKind.Js);
-            _ = dp.Parser.CreateSourceFile("file.js", ScriptTarget.Latest, ScriptKind.Js);
+
+            var sourceFile = dp.Parser.CreateSourceFile("file.js", ScriptTarget.Latest, ScriptKind.Js);
 
             dp.Parser.Scanner.SetText(content, start, length);
-            _ = dp.Parser.Scanner.Scan();
+
+            var currentToken = dp.Parser.Scanner.Scan();
             var jsDocTypeExpression = dp.ParseJsDocTypeExpression();
             var diagnostics = dp.Parser.ParseDiagnostics;
 
@@ -500,7 +502,7 @@ namespace Sdcb.TypeScript.TsParser
 
         public   JsDocType ParseJsDocUnknownOrNullableType()
         {
-            _ = Scanner.GetStartPos();
+            var pos = Scanner.GetStartPos();
 
             NextToken();
             if (Token() == SyntaxKind.CommaToken ||
@@ -579,8 +581,8 @@ namespace Sdcb.TypeScript.TsParser
             Debug.Assert(start <= end);
 
             Debug.Assert(end <= content.Length);
-            var tags = new NodeArray<IJsDocTag>();
-            var comments = new List<string>();
+            NodeArray<IJsDocTag> tags = new NodeArray<IJsDocTag>();
+            List<string> comments = new List<string>();
             JsDoc result = null;
             if (!IsJsDocStart(content, (int)start))
             {
@@ -871,7 +873,7 @@ namespace Sdcb.TypeScript.TsParser
 
             List<string> ParseTagComments(int indent)
             {
-                var comments2 = new List<string>();
+                List<string> comments2 = new List<string>();
                 var state = JSDocState.SawAsterisk;
                 int? margin = null;
                 while (Token() != SyntaxKind.AtToken && Token() != SyntaxKind.EndOfFileToken)
@@ -1221,7 +1223,7 @@ namespace Sdcb.TypeScript.TsParser
                         var jsDocTypeReference = (JsDocTypeReference)typeExpression.Type;
                         if ((SyntaxKind)jsDocTypeReference.Name.Kind == SyntaxKind.Identifier)
                         {
-                            var name = jsDocTypeReference.Name as Identifier;
+                            Identifier name = jsDocTypeReference.Name as Identifier;
                             if (name?.Text == "Object")
                             {
 

@@ -142,7 +142,7 @@ namespace Sdcb.TypeScript.TsParser
         public static List<string> GetNormalizedParts(string normalizedSlashedPath, int rootLength)
         {
             var parts = normalizedSlashedPath.Substring(rootLength).Split(DirectorySeparator);
-            var normalized = new List<string>();
+            List<string> normalized = new List<string>();
             foreach (var part in parts)
             {
                 if (part != ".")
